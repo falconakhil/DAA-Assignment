@@ -77,7 +77,7 @@ def run_experiment(functions, test_cases, iterations=1, warmup=0):
         
         for i, case in enumerate(tqdm(test_cases, desc=f"{func_name}: ")):
             # Add iterations and warmup as the first arguments
-            stats = _calculate_runtime(func, iterations, warmup, case)
+            stats = _calculate_runtime(func, iterations, warmup, case.copy())
             
             # Add test case length to the statistics
             # If case is a list, tuple, string or other sequence type
@@ -93,7 +93,5 @@ def run_experiment(functions, test_cases, iterations=1, warmup=0):
             # print(f"  Test case {i+1}: Avg runtime = {stats['avg']:.6f} sec, "
             #       f"Min = {stats['min']:.6f} sec, Max = {stats['max']:.6f} sec, "
             #       f"Total = {stats['total']:.6f} sec ({stats['iterations']} iterations)")
-        print()
-    
         print()
     return results
