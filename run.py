@@ -1,6 +1,6 @@
 from utils.load_testcases import load_testcases
 from utils.run_experiment import run_experiment
-from utils.plot_graph import plot_algorithm_scaling
+from utils.plot_graph import plot_algorithm_scaling,plot_algorithm_comparison_subplots
 
 from algorithms.quick_sort import quick_sort_first_pivot, quick_sort_median_pivot, quick_sort_random_pivot
 from algorithms.radix_sort import radix_sort
@@ -10,7 +10,7 @@ from algorithms.heap_sort import heap_sort
 from algorithms.bubble_sort import bubble_sort
 
 
-TESTCASE_FILE='test.txt'
+TESTCASE_FILE='test_data.txt'
 ITERATIONS_PER_TESTCASE=3
 WARMUP_PER_TESTCASE=0
 FUNCTIONS=[
@@ -19,9 +19,9 @@ FUNCTIONS=[
     insertion_sort,
     merge_sort,
     radix_sort,
-    quick_sort_first_pivot,
-    quick_sort_median_pivot,
-    quick_sort_random_pivot,
+    # quick_sort_first_pivot,
+    # quick_sort_median_pivot,
+    # quick_sort_random_pivot,
 ]
 
 
@@ -29,7 +29,7 @@ FUNCTIONS=[
 testcases=load_testcases(TESTCASE_FILE)
 results=run_experiment(FUNCTIONS, testcases, iterations=ITERATIONS_PER_TESTCASE, warmup=WARMUP_PER_TESTCASE)
 
-plot_algorithm_scaling(results)
+plot_algorithm_comparison_subplots(results)
 print(results)
 
 
