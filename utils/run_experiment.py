@@ -84,7 +84,6 @@ def run_experiment(functions, test_cases, iterations=1, warmup=0):
             # print(f"  Test case {i+1}: Avg runtime = {stats['avg']:.6f} sec, "
             #       f"Min = {stats['min']:.6f} sec, Max = {stats['max']:.6f} sec, "
             #       f"Total = {stats['total']:.6f} sec ({stats['iterations']} iterations)")
-
         print()
     
     return results
