@@ -19,15 +19,65 @@ def _partition(arr, low, high, pivot_index):
     arr[i + 1], arr[high] = arr[high], arr[i + 1]
     return i + 1
 
-def _choose_pivot(arr, low, high, mode):
-    if mode == 1:
-        # Mode 1: First element as pivot
-        return low
-    elif mode == 2:
-        # Mode 2: Random element as pivot
-        return random.randint(low, high)
-    elif mode == 3:
-        # Mode 3: Median of three
+def quick_sort_first_pivot(arr):
+    """
+    Sort an array using QuickSort with first element as pivot.
+    
+    Args:
+        arr: The array to sort
+    """
+    if not arr:
+        return
+    
+    def _quick_sort_helper(low, high):
+        if low < high:
+            # Choose the first element as pivot
+            pivot_index = low
+            
+            # Find the partition index
+            pi = _partition(arr, low, high, pivot_index)
+            
+            # Recursively sort elements before and after the partition
+            _quick_sort_helper(low, pi - 1)
+            _quick_sort_helper(pi + 1, high)
+    
+    _quick_sort_helper(0, len(arr) - 1)
+
+def quick_sort_random_pivot(arr):
+    """
+    Sort an array using QuickSort with a random element as pivot.
+    
+    Args:
+        arr: The array to sort
+    """
+    if not arr:
+        return
+    
+    def _quick_sort_helper(low, high):
+        if low < high:
+            # Choose a random element as pivot
+            pivot_index = random.randint(low, high)
+            
+            # Find the partition index
+            pi = _partition(arr, low, high, pivot_index)
+            
+            # Recursively sort elements before and after the partition
+            _quick_sort_helper(low, pi - 1)
+            _quick_sort_helper(pi + 1, high)
+    
+    _quick_sort_helper(0, len(arr) - 1)
+
+def quick_sort_median_pivot(arr):
+    """
+    Sort an array using QuickSort with median of three elements as pivot.
+    
+    Args:
+        arr: The array to sort
+    """
+    if not arr:
+        return
+    
+    def _median_of_three(low, high):
         mid = low + (high - low) // 2
         # Find median of first, middle, and last element
         if arr[low] <= arr[mid] <= arr[high] or arr[high] <= arr[mid] <= arr[low]:
@@ -36,47 +86,39 @@ def _choose_pivot(arr, low, high, mode):
             return low
         else:
             return high
-    else:
-        # Default: last element as pivot
-        return high
-
-def _quick_sort_helper(arr, low, high, mode):
-    if low < high:
-        # Choose pivot based on mode
-        pivot_index = _choose_pivot(arr, low, high, mode)
-        
-        # Find the partition index
-        pi = _partition(arr, low, high, pivot_index)
-        
-        # Recursively sort elements before and after the partition
-        _quick_sort_helper(arr, low, pi - 1, mode)
-        _quick_sort_helper(arr, pi + 1, high, mode)
-
-def quick_sort(arr, mode=0):
-    """
-    Sort an array using the QuickSort algorithm.
     
-    Args:
-        arr: The array to sort
-        mode: Pivot selection strategy:
-              0 - last element (default)
-              1 - first element
-              2 - random element
-              3 - median of first, middle, and last elements
-    """
-    if not arr:
-        return
+    def _quick_sort_helper(low, high):
+        if low < high:
+            # Choose the median of three elements as pivot
+            pivot_index = _median_of_three(low, high)
+            
+            # Find the partition index
+            pi = _partition(arr, low, high, pivot_index)
+            
+            # Recursively sort elements before and after the partition
+            _quick_sort_helper(low, pi - 1)
+            _quick_sort_helper(pi + 1, high)
     
-    _quick_sort_helper(arr, 0, len(arr) - 1, mode)
+    _quick_sort_helper(0, len(arr) - 1)
 
 # Example usage
 if __name__ == "__main__":
-    # Test with different pivot selection modes
+    # Test with different pivot selection strategies
     test_array = [10, 7, 8, 9, 1, 5]
     
-    for mode in range(1, 4):
-        arr = test_array.copy()
-        print(f"Unsorted array: {arr}")
-        quick_sort(arr, mode)
-        print(f"Sorted array (mode {mode}): {arr}")
-        print()
+    arr1 = test_array.copy()
+    print(f"Unsorted array: {arr1}")
+    quick_sort_first_pivot(arr1)
+    print(f"Sorted array (first pivot): {arr1}")
+    print()
+    
+    arr2 = test_array.copy()
+    print(f"Unsorted array: {arr2}")
+    quick_sort_random_pivot(arr2)
+    print(f"Sorted array (random pivot): {arr2}")
+    print()
+    
+    arr3 = test_array.copy()
+    print(f"Unsorted array: {arr3}")
+    quick_sort_median_pivot(arr3)
+    print(f"Sorted array (median pivot): {arr3}")
