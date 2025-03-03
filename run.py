@@ -1,6 +1,6 @@
 from utils.load_testcases import load_testcases
 from utils.run_experiment import run_experiment
-from utils.plot_graph import plot_algorithm_scaling,plot_algorithm_comparison_subplots
+from utils.plot_graph import plot_algorithm_comparison_subplots
 
 from algorithms.quick_sort import quick_sort_first_pivot, quick_sort_median_pivot, quick_sort_random_pivot
 from algorithms.radix_sort import radix_sort
