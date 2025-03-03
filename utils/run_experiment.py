@@ -62,7 +62,7 @@ def run_experiment(functions, test_cases, iterations=1, warmup=0):
     
     Returns:
         dict: A dictionary where keys are function names and values are lists of dictionaries
-              containing the function's return value and detailed runtime statistics for each test case.
+              containing the function's return value, test case length, and detailed runtime statistics for each test case.
     """
     # Convert single function to list for uniform handling
     if callable(functions) and not isinstance(functions, list):
@@ -78,6 +78,15 @@ def run_experiment(functions, test_cases, iterations=1, warmup=0):
         for i, case in enumerate(tqdm(test_cases, desc=f"{func_name}: ")):
             # Add iterations and warmup as the first arguments
             stats = _calculate_runtime(func, iterations, warmup, case)
+            
+            # Add test case length to the statistics
+            # If case is a list, tuple, string or other sequence type
+            try:
+                stats['input_size'] = len(case)
+            except (TypeError, AttributeError):
+                # If the case doesn't have a length (like an integer)
+                stats['input_size'] = 1
+            
             results[func_name].append(stats)
             
             # # Print more detailed statistics
@@ -86,4 +95,5 @@ def run_experiment(functions, test_cases, iterations=1, warmup=0):
             #       f"Total = {stats['total']:.6f} sec ({stats['iterations']} iterations)")
         print()
     
+        print()
     return results

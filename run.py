@@ -1,5 +1,6 @@
 from utils.load_testcases import load_testcases
 from utils.run_experiment import run_experiment
+from utils.plot_graph import plot_algorithm_scaling
 
 from algorithms.quick_sort import quick_sort_first_pivot, quick_sort_median_pivot, quick_sort_random_pivot
 from algorithms.radix_sort import radix_sort
@@ -28,6 +29,7 @@ FUNCTIONS=[
 testcases=load_testcases(TESTCASE_FILE)
 results=run_experiment(FUNCTIONS, testcases, iterations=ITERATIONS_PER_TESTCASE, warmup=WARMUP_PER_TESTCASE)
 
+plot_algorithm_scaling(results)
 print(results)
 
 
