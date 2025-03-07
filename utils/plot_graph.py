@@ -124,7 +124,8 @@ def plot_algorithm_comparison_subplots(results, title_prefix="Algorithm Performa
     
     # Save if requested
     if save_plots:
-        plt.savefig("algorithm_comparison_grouped.png", dpi=300, bbox_inches='tight')
-    
-    plt.show()
+        plt.savefig("algorithm_comparison.png", dpi=300, bbox_inches='tight')
+        print("Plot saved as 'algorithm_comparison.png'")
+    else:
+        plt.show()
     return fig

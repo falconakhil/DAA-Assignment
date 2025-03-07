@@ -21,15 +21,25 @@ def _partition(arr, low, high, pivot_index):
 
 def quick_sort_first_pivot(arr):
     """
-    Sort an array using QuickSort with first element as pivot.
+    Sort an array using iterative QuickSort with first element as pivot.
     
     Args:
         arr: The array to sort
     """
-    if not arr:
+    if not arr or len(arr) <= 1:
         return
     
-    def _quick_sort_helper(low, high):
+    # Create an auxiliary stack
+    stack = []
+    
+    # Push initial values of low and high to stack
+    stack.append((0, len(arr) - 1))
+    
+    # Keep popping from stack while it's not empty
+    while stack:
+        # Pop low and high
+        low, high = stack.pop()
+        
         if low < high:
             # Choose the first element as pivot
             pivot_index = low
@@ -37,23 +47,31 @@ def quick_sort_first_pivot(arr):
             # Find the partition index
             pi = _partition(arr, low, high, pivot_index)
             
-            # Recursively sort elements before and after the partition
-            _quick_sort_helper(low, pi - 1)
-            _quick_sort_helper(pi + 1, high)
-    
-    _quick_sort_helper(0, len(arr) - 1)
+            # Push subarrays to stack
+            stack.append((low, pi - 1))   # Elements before partition
+            stack.append((pi + 1, high))  # Elements after partition
 
 def quick_sort_random_pivot(arr):
     """
-    Sort an array using QuickSort with a random element as pivot.
+    Sort an array using iterative QuickSort with a random element as pivot.
     
     Args:
         arr: The array to sort
     """
-    if not arr:
+    if not arr or len(arr) <= 1:
         return
     
-    def _quick_sort_helper(low, high):
+    # Create an auxiliary stack
+    stack = []
+    
+    # Push initial values of low and high to stack
+    stack.append((0, len(arr) - 1))
+    
+    # Keep popping from stack while it's not empty
+    while stack:
+        # Pop low and high
+        low, high = stack.pop()
+        
         if low < high:
             # Choose a random element as pivot
             pivot_index = random.randint(low, high)
@@ -61,20 +79,18 @@ def quick_sort_random_pivot(arr):
             # Find the partition index
             pi = _partition(arr, low, high, pivot_index)
             
-            # Recursively sort elements before and after the partition
-            _quick_sort_helper(low, pi - 1)
-            _quick_sort_helper(pi + 1, high)
-    
-    _quick_sort_helper(0, len(arr) - 1)
+            # Push subarrays to stack
+            stack.append((low, pi - 1))   # Elements before partition
+            stack.append((pi + 1, high))  # Elements after partition
 
 def quick_sort_median_pivot(arr):
     """
-    Sort an array using QuickSort with median of three elements as pivot.
+    Sort an array using iterative QuickSort with median of three elements as pivot.
     
     Args:
         arr: The array to sort
     """
-    if not arr:
+    if not arr or len(arr) <= 1:
         return
     
     def _median_of_three(low, high):
@@ -87,7 +103,17 @@ def quick_sort_median_pivot(arr):
         else:
             return high
     
-    def _quick_sort_helper(low, high):
+    # Create an auxiliary stack
+    stack = []
+    
+    # Push initial values of low and high to stack
+    stack.append((0, len(arr) - 1))
+    
+    # Keep popping from stack while it's not empty
+    while stack:
+        # Pop low and high
+        low, high = stack.pop()
+        
         if low < high:
             # Choose the median of three elements as pivot
             pivot_index = _median_of_three(low, high)
@@ -95,11 +121,9 @@ def quick_sort_median_pivot(arr):
             # Find the partition index
             pi = _partition(arr, low, high, pivot_index)
             
-            # Recursively sort elements before and after the partition
-            _quick_sort_helper(low, pi - 1)
-            _quick_sort_helper(pi + 1, high)
-    
-    _quick_sort_helper(0, len(arr) - 1)
+            # Push subarrays to stack
+            stack.append((low, pi - 1))   # Elements before partition
+            stack.append((pi + 1, high))  # Elements after partition
 
 # Example usage
 if __name__ == "__main__":
