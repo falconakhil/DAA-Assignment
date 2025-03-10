@@ -1,25 +1,26 @@
-1. Machine Information:
-   - System: Windows 11
-   - Processor: Intel64 Family 6 Model 186 Stepping 2, GenuineIntel
-   - Python Version: 3.13.0
+1. Machine Information: 
+  - System: Linux 6.12.17-1-MANJARO 
+  - Processor:  13th Gen Intel i3-1315U (8) @ 4.500GHz 
+  - Python Version: 3.12.7 
 
-2. Timing Mechanism:
-   - Using Python's time.perf_counter() for high-precision timing
-   - All times reported in seconds
+2. Timing Mechanism: 
+  - Using Python's time.perf_counter() for high-precision timing 
+  - All times reported in seconds 
 
-3. Experiment Repetition:
-   - Each sorting algorithm was run 3 times per input
-   - Warmup iterations per test case: 0
+3. Experiment Repetition: 
+  - Each sorting algorithm was run 3 times per input 
+  - Warmup iterations per test case: 0 
 
-4. Time Reporting:
-   - Average execution time across 3 iterations is reported
-   - Standard deviation is calculated to measure consistency
+4. Time Reporting: 
+  - Average execution time across 3 iterations is reported 
+  - Standard deviation is calculated to measure consistency 
 
-5. Input Selection:
-   - Test data loaded from file: 'test_data.txt'
-   - Number of different test cases: 437
-   - Input sizes range from 50 to 2000
+5. Input Selection: 
+  - Test data loaded from file: 'test_data.txt' 
+  - Number of different test cases: 437 
+  - Input sizes range from 50 to 2000 
 
-6. Input Consistency:
-   - Same inputs were used for all sorting algorithms
-   - Each algorithm was tested on identical data for fair comparison
+6. Input Consistency: 
+  - Same inputs were used for all sorting algorithms 
+  - Each algorithm was tested on identical data for fair comparison 
+
