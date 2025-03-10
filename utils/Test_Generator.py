@@ -1,4 +1,5 @@
 import random
+from tqdm import tqdm
 
 STEP_SIZE = 50
 START = 50
@@ -62,7 +63,7 @@ def write_array(arr): # Function for writing into a file
 
 if __name__ == '__main__':
 
-    for element_count in range(START, END+1, STEP_SIZE):
+    for element_count in tqdm(range(START, END+1, STEP_SIZE),desc='Progress Bar'):
         
         arr = generator_1(element_count)
         write_array(arr)
@@ -77,6 +78,6 @@ if __name__ == '__main__':
         write_array(arr)
 
         # Dynamically varying the number of randomly generated examples for all files
-        for arr_num in range(element_count):
+        for arr_num in range(int(pow(element_count, 0.25)) + 2):
             arr = generator_5(element_count, seed = ((arr_num * 43) % 7))
             write_array(arr)
