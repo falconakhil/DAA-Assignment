@@ -73,7 +73,6 @@ def run_experiment(functions, test_cases, iterations=1, warmup=0):
     for func in functions:
         func_name = func.__name__
         results[func_name] = []
-        # print(f"\nRunning tests for function: {func_name}")
         
         for i, case in enumerate(tqdm(test_cases, desc=f"{func_name}: ")):
             # Add iterations and warmup as the first arguments
@@ -89,9 +88,4 @@ def run_experiment(functions, test_cases, iterations=1, warmup=0):
             
             results[func_name].append(stats)
             
-            # # Print more detailed statistics
-            # print(f"  Test case {i+1}: Avg runtime = {stats['avg']:.6f} sec, "
-            #       f"Min = {stats['min']:.6f} sec, Max = {stats['max']:.6f} sec, "
-            #       f"Total = {stats['total']:.6f} sec ({stats['iterations']} iterations)")
-        print()
     return results
