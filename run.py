@@ -1,6 +1,6 @@
 from utils.load_testcases import load_testcases
 from utils.run_experiment import run_experiment
-from utils.plot_graph import plot_algorithm_comparison_subplots,plot_algorithm_comparison_separate
+from utils.plot_graph import plot_algorithm_comparison,plot_comparative_performance,plot_testcase_comparison
 
 from algorithms.quick_sort import quick_sort_first_pivot, quick_sort_median_pivot, quick_sort_random_pivot
 from algorithms.radix_sort import radix_sort
@@ -13,10 +13,9 @@ import platform
 from prettytable import PrettyTable
 import numpy as np
 
-
-TESTCASE_FILE='test_data.txt'
 ITERATIONS_PER_TESTCASE=3
 WARMUP_PER_TESTCASE=0
+
 FUNCTIONS=[
     # bubble_sort,
     # heap_sort,
@@ -28,41 +27,50 @@ FUNCTIONS=[
     quick_sort_random_pivot,
 ]
 
+TESTCASE_FILES = {
+    'ascending': 'testcases/ascending.txt',
+    'descending': 'testcases/descending.txt',
+    'bst': 'testcases/bst.txt',
+    'bst_reverse': 'testcases/bst_reverse.txt',
+    'all': 'testcases/complete_dataset.txt',
+    'random': 'testcases/random.txt',
+}
 
-def analyze_results(results):
+
+def analyze_all_results(all_results):
     """
-    Print a detailed analysis of the sorting algorithm results focusing on execution times.
+    Print a detailed analysis of the sorting algorithm all_results focusing on execution times.
     
     Args:
-        results: Dictionary mapping each sorting function name to its performance results
+        all_results: Dictionary mapping each sorting function name to its performance all_results
                 Format from run_experiment: {function_name: [list of stats dictionaries]}
     """
     print("\n" + "="*80)
     print("SORTING ALGORITHM PERFORMANCE ANALYSIS".center(80))
     print("="*80)
 
-    # Process the raw results into a more usable format
-    processed_results = {}
-    for func_name, test_cases in results.items():
-        processed_results[func_name] = {}
+    # Process the raw all_results into a more usable format
+    processed_all_results = {}
+    for func_name, test_cases in all_results.items():
+        processed_all_results[func_name] = {}
         for case in test_cases:
             input_size = case['input_size']
-            if input_size not in processed_results[func_name]:
-                processed_results[func_name][input_size] = []
-            processed_results[func_name][input_size].append((case['avg'], case['min'], case['max']))
+            if input_size not in processed_all_results[func_name]:
+                processed_all_results[func_name][input_size] = []
+            processed_all_results[func_name][input_size].append((case['avg'], case['min'], case['max']))
     
     # Calculate aggregate statistics for each algorithm and input size
-    final_results = {}
-    for func_name, size_data in processed_results.items():
-        final_results[func_name] = {}
+    final_all_results = {}
+    for func_name, size_data in processed_all_results.items():
+        final_all_results[func_name] = {}
         for size, times_list in size_data.items():
             avg_time = np.mean([t[0] for t in times_list])
             std_dev = np.std([t[0] for t in times_list]) if len(times_list) > 1 else 0
-            final_results[func_name][size] = (avg_time, std_dev)
+            final_all_results[func_name][size] = (avg_time, std_dev)
     
     # Extract all input sizes
     all_input_sizes = set()
-    for func_result in final_results.values():
+    for func_result in final_all_results.values():
         all_input_sizes.update(func_result.keys())
     input_sizes = sorted(all_input_sizes)
     
@@ -76,9 +84,9 @@ def analyze_results(results):
                          "Best Time Input Size", "Worst Time Input Size"]
     
     # Calculate metrics for each algorithm
-    for func_name, size_results in final_results.items():
+    for func_name, size_all_results in final_all_results.items():
         # Calculate average time across all input sizes
-        avg_time = np.mean([time for time, _ in size_results.values()])
+        avg_time = np.mean([time for time, _ in size_all_results.values()])
         
         # Find best and worst times
         best_time = float('inf')
@@ -86,7 +94,7 @@ def analyze_results(results):
         best_size = None
         worst_size = None
         
-        for size, (time, _) in size_results.items():
+        for size, (time, _) in size_all_results.items():
             if time < best_time:
                 best_time = time
                 best_size = size
@@ -128,10 +136,10 @@ def analyze_results(results):
         comparison_table.field_names = ["Algorithm", "Execution Time (s)"]
         
         algorithms_at_largest = []
-        for func_name, size_results in final_results.items():
-            if largest_input in size_results:
+        for func_name, size_all_results in final_all_results.items():
+            if largest_input in size_all_results:
                 algo_name = func_name.replace('_', ' ').title()
-                time = size_results[largest_input][0]
+                time = size_all_results[largest_input][0]
                 algorithms_at_largest.append((algo_name, time))
                 comparison_table.add_row([algo_name, f"{time:.6f}"])
         
@@ -142,42 +150,56 @@ def analyze_results(results):
     print("\n" + "="*80 + "\n")
 
 
-testcases=load_testcases(TESTCASE_FILE)
-results=run_experiment(FUNCTIONS, testcases, iterations=ITERATIONS_PER_TESTCASE, warmup=WARMUP_PER_TESTCASE)
 
-# Print experimental setup information
-print("\n" + "="*80)
-print("EXPERIMENTAL SETUP INFORMATION".center(80))
-print("="*80)
+def display_machine_specs(testcases):
+    print("\n" + "="*80)
+    print("EXPERIMENTAL SETUP INFORMATION".center(80))
+    print("="*80)
 
-print(f"\n1. Machine Information:")
-print(f"   - System: {platform.system()} {platform.release()}")
-print(f"   - Processor: {platform.processor()}")
-print(f"   - Python Version: {platform.python_version()}")
+    print(f"\n1. Machine Information:")
+    print(f"   - System: {platform.system()} {platform.release()}")
+    print(f"   - Processor: {platform.processor()}")
+    print(f"   - Python Version: {platform.python_version()}")
 
-print(f"\n2. Timing Mechanism:")
-print(f"   - Using Python's time.perf_counter() for high-precision timing")
-print(f"   - All times reported in seconds")
+    print(f"\n2. Timing Mechanism:")
+    print(f"   - Using Python's time.perf_counter() for high-precision timing")
+    print(f"   - All times reported in seconds")
 
-print(f"\n3. Experiment Repetition:")
-print(f"   - Each sorting algorithm was run {ITERATIONS_PER_TESTCASE} times per input")
-print(f"   - Warmup iterations per test case: {WARMUP_PER_TESTCASE}")
+    print(f"\n3. Experiment Repetition:")
+    print(f"   - Each sorting algorithm was run {ITERATIONS_PER_TESTCASE} times per input")
+    print(f"   - Warmup iterations per test case: {WARMUP_PER_TESTCASE}")
 
-print(f"\n4. Time Reporting:")
-print(f"   - Average execution time across {ITERATIONS_PER_TESTCASE} iterations is reported")
-print(f"   - Standard deviation is calculated to measure consistency")
+    print(f"\n4. Time Reporting:")
+    print(f"   - Average execution time across {ITERATIONS_PER_TESTCASE} iterations is reported")
+    print(f"   - Standard deviation is calculated to measure consistency")
 
-print(f"\n5. Input Selection:")
-print(f"   - Test data loaded from file: '{TESTCASE_FILE}'")
-print(f"   - Number of different test cases: {len(testcases)}")
-if testcases:
-    print(f"   - Input sizes range from {min(len(tc) for tc in testcases)} to {max(len(tc) for tc in testcases)}")
+    print(f"\n5. Input Selection:")
+    print(f"   - Number of different test cases: {len(testcases)}")
+    if testcases:
+        print(f"   - Input sizes range from {min(len(tc) for tc in testcases)} to {max(len(tc) for tc in testcases)}")
 
-print(f"\n6. Input Consistency:")
-print(f"   - Same inputs were used for all sorting algorithms")
-print(f"   - Each algorithm was tested on identical data for fair comparison")
+    print(f"\n6. Input Consistency:")
+    print(f"   - Same inputs were used for all sorting algorithms")
+    print(f"   - Each algorithm was tested on identical data for fair comparison")
 
-print("\n" + "="*80 + "\n")
+    print("\n" + "="*80 + "\n")
 
-analyze_results(results)
-plot_algorithm_comparison_separate(results,save_plots=True)
+if __name__=='__main__':
+
+    testcases={}
+    for arrangement,file in TESTCASE_FILES.items():
+        testcases[arrangement]=load_testcases(file)
+
+    results={}
+    for arrangement,testcase in testcases.items():
+        print(f"Running experiment on {arrangement}":)
+        results[arrangement]=run_experiment(FUNCTIONS, testcase, iterations=ITERATIONS_PER_TESTCASE, warmup=WARMUP_PER_TESTCASE)
+        print()
+
+    display_machine_specs(testcases['all'])
+
+    analyze_all_results(results['all'])
+
+    plot_algorithm_comparison(results['all'],save_plots=True)
+    plot_comparative_performance(results['all'],save_plots=True)
+    plot_testcase_comparison(results,save_plots=True)
