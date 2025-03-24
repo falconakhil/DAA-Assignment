@@ -55,8 +55,8 @@ def generator_5(element_count, seed=42): # Generates list with elements arranged
     
     return arr
 
-def write_array(arr): # Function for writing into a file
-    with open("test_data.txt", "a") as file:  # "a" mode appends to the existing content
+def write_array(arr, filename): # Function for writing into a file
+    with open(filename, "a") as file:  # "a" mode appends to the existing content
         file.write(f'{len(arr)}\n')
         for num in arr:
             file.write(f'{num}\n')
@@ -66,18 +66,23 @@ if __name__ == '__main__':
     for element_count in tqdm(range(START, END+1, STEP_SIZE),desc='Progress Bar'):
         
         arr = generator_1(element_count)
-        write_array(arr)
+        write_array(arr, 'complete_dataset.txt')
+        write_array(arr, 'ascending.txt')
 
         arr = generator_2(element_count)
-        write_array(arr)
+        write_array(arr, 'complete_dataset.txt')
+        write_array(arr, 'descending.txt')
 
         arr = generator_3(element_count)
-        write_array(arr)
+        write_array(arr, 'complete_dataset.txt')
+        write_array(arr, 'bst.txt')
 
         arr = generator_4(element_count)
-        write_array(arr)
+        write_array(arr, 'complete_dataset.txt')
+        write_array(arr, 'bst_reverse.txt')
 
         # Dynamically varying the number of randomly generated examples for all files
         for arr_num in range(int(pow(element_count, 0.25)) + 2):
             arr = generator_5(element_count, seed = ((arr_num * 43) % 7))
-            write_array(arr)
+            write_array(arr, 'complete_dataset.txt')
+            write_array(arr, 'random.txt')
