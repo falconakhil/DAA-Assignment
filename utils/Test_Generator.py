@@ -1,5 +1,6 @@
 import random
 from tqdm import tqdm
+import os
 
 STEP_SIZE = 50
 START = 50
@@ -56,6 +57,11 @@ def generator_5(element_count, seed=42): # Generates list with elements arranged
     return arr
 
 def write_array(arr, filename): # Function for writing into a file
+    save_dir = 'testcases/'
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+        print(f"Created directory: {save_dir}")
+    filename = os.path.join(save_dir, filename)
     with open(filename, "a") as file:  # "a" mode appends to the existing content
         file.write(f'{len(arr)}\n')
         for num in arr:
