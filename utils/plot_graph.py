@@ -2,6 +2,11 @@ import matplotlib.pyplot as plt
 import math
 from collections import defaultdict
 import os
+import numpy as np
+import warnings
+
+warnings.filterwarnings("ignore")
+
 
 def _ensure_directory_exists(directory_path):
     """
@@ -295,6 +300,7 @@ def plot_testcase_comparison(results_by_testcase, title_prefix="Performance by T
     
     # For each testcase type
     for testcase_name, testcase_results in results_by_testcase.items():
+        
         # Get all function names for this testcase
         func_names = list(testcase_results.keys())
         display_names = [name.replace('_', ' ').title() for name in func_names]
@@ -397,6 +403,162 @@ def plot_testcase_comparison(results_by_testcase, title_prefix="Performance by T
             filename = os.path.join(save_dir, f"{testcase_name}_comparison.png")
             plt.savefig(filename, dpi=300, bbox_inches='tight')
             print(f"Testcase plot saved as '{filename}'")
+        
+        figures.append(fig)
+    
+    if not save_plots:
+        plt.show()
+    
+    return figures
+
+
+def plot_arrangement_comparison(results_by_testcase, title_prefix="Algorithm Performance by Arrangement: ", 
+                             log_scale=False, save_plots=False, 
+                             save_dir='outputs/arrangement_plots/'):
+    """
+    Creates separate plots for each sorting algorithm, with each plot containing 
+    subplots for the different arrangements (ascending, descending, BST, etc.).
+    
+    Args:
+        results_by_testcase (dict): Dictionary with testcase names as keys and experiment results as values.
+                                  Expected format: {'ascending': {func_name: [test_results]}, 'descending': {...}}
+        title_prefix (str): Prefix for the plot titles.
+        log_scale (bool): Whether to use logarithmic scale for the y-axis.
+        save_plots (bool): Whether to save the plots as image files.
+        save_dir (str): Directory to save the plots if save_plots is True.
+    
+    Returns:
+        list: List of figure objects created.
+    """
+    # Colors and markers for different arrangements
+    colors = plt.cm.tab10(range(10))
+    markers = ['o', 's', '^', 'D', 'x', '*', '+', 'v', '<', '>']
+    
+    # Get all unique function names across all testcases
+    all_func_names = set()
+    for testcase_results in results_by_testcase.values():
+        all_func_names.update(testcase_results.keys())
+    func_names = sorted(all_func_names)
+    
+    # Get all testcase names
+    testcase_names = list(results_by_testcase.keys())
+    testcase_display_names = [name.replace('_', ' ').capitalize() for name in testcase_names]
+    
+    figures = []
+    
+    # Create a plot for each sorting algorithm
+    for func_name in func_names:
+        # First, prepare the data for this function across all testcases
+        grouped_results = {}
+        
+        for testcase_name in testcase_names:
+            if func_name in results_by_testcase[testcase_name]:
+                testcase_results = results_by_testcase[testcase_name][func_name]
+                grouped_results[testcase_name] = defaultdict(lambda: {'avg_sum': 0, 'count': 0})
+                
+                # Group by input size
+                for test_case in testcase_results:
+                    input_size = test_case['input_size']
+                    grouped_results[testcase_name][input_size]['avg_sum'] += test_case['avg']
+                    grouped_results[testcase_name][input_size]['count'] += 1
+                
+                # Calculate averages
+                for input_size in grouped_results[testcase_name]:
+                    count = grouped_results[testcase_name][input_size]['count']
+                    grouped_results[testcase_name][input_size]['avg'] = grouped_results[testcase_name][input_size]['avg_sum'] / count
+        
+        # Find all unique input sizes for this function
+        all_input_sizes = set()
+        for testcase_data in grouped_results.values():
+            all_input_sizes.update(testcase_data.keys())
+        input_sizes = sorted(all_input_sizes)
+        
+        # Create a single plot with subplots for each arrangement
+        n_arrangements = len(grouped_results)
+        n_cols = min(3, n_arrangements)  # Max 3 columns
+        n_rows = (n_arrangements + n_cols - 1) // n_cols  # Ceiling division
+        
+        if n_arrangements == 0:
+            continue  # Skip if no data for this function
+            
+        # Changed sharey=True to sharey=False to give each subplot its own scale
+        fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 4 * n_rows), sharex=True, sharey=False)
+        fig.suptitle(f"{title_prefix}{func_name.replace('_', ' ').title()}", fontsize=18)
+        
+        # Make axes indexable for all cases
+        if n_rows == 1 and n_cols == 1:
+            axes = np.array([[axes]])  # Convert to 2D array
+        elif n_rows == 1:
+            axes = np.array([axes])  # Convert to 2D array with 1 row
+        elif n_cols == 1:
+            axes = np.array([[ax] for ax in axes])  # Convert to 2D array with 1 column
+            
+        # Plot each arrangement in its own subplot
+        arrangement_idx = 0
+        for testcase_name, display_name in zip(testcase_names, testcase_display_names):
+            if testcase_name in grouped_results:
+                row = arrangement_idx // n_cols
+                col = arrangement_idx % n_cols
+                ax = axes[row, col]
+                
+                x_values = []
+                y_values = []
+                
+                for size in input_sizes:
+                    if size in grouped_results[testcase_name]:
+                        x_values.append(size)
+                        y_values.append(grouped_results[testcase_name][size]['avg'])
+                
+                # Plot with both scatter points and lines
+                ax.scatter(x_values, y_values, 
+                          color=colors[arrangement_idx % len(colors)], 
+                          marker=markers[arrangement_idx % len(markers)],
+                          s=60, alpha=0.7, 
+                          edgecolors='black', linewidths=0.5)
+                
+                ax.plot(x_values, y_values, 
+                       color=colors[arrangement_idx % len(colors)],
+                       linestyle='-', alpha=0.6)
+                
+                # Set title and labels for subplot
+                ax.set_title(f"{display_name}", fontsize=12)
+                ax.grid(True, linestyle='--', alpha=0.6)
+                
+                # Set y-axis label only for leftmost plots
+                if col == 0:
+                    ax.set_ylabel('Time (seconds)', fontsize=10)
+                
+                # Set x-axis label only for bottom plots
+                if row == n_rows - 1 or (row * n_cols + col) >= min(n_arrangements, n_rows * n_cols) - n_cols:
+                    ax.set_xlabel('Input Size', fontsize=10)
+                
+                # Set x-axis tick labels
+                ax.set_xticks(input_sizes)
+                if len(input_sizes) > 10:
+                    interval = max(1, len(input_sizes) // 5)
+                    x_labels = [str(size) if i % interval == 0 else '' for i, size in enumerate(input_sizes)]
+                    ax.set_xticklabels(x_labels, rotation=45)
+                
+                # Set log scale if requested
+                if log_scale:
+                    ax.set_yscale('log')
+                
+                arrangement_idx += 1
+        
+        # Remove any empty subplots
+        for i in range(n_arrangements, n_rows * n_cols):
+            row = i // n_cols
+            col = i % n_cols
+            fig.delaxes(axes[row, col])
+        
+        plt.tight_layout(rect=[0, 0, 1, 0.95])  # Make room for suptitle
+        
+        # Save if requested
+        if save_plots:
+            _ensure_directory_exists(save_dir)
+            filename = os.path.join(save_dir, f"{func_name}_by_arrangement.png")
+            plt.savefig(filename, dpi=300, bbox_inches='tight')
+            print(f"Arrangement plot saved as '{filename}'")
         
         figures.append(fig)
     
