@@ -1,6 +1,6 @@
 from utils.load_testcases import load_testcases
 from utils.run_experiment import run_experiment
-from utils.plot_graph import plot_algorithm_comparison,plot_comparative_performance,plot_testcase_comparison,plot_arrangement_comparison,plot_overall_comparison
+from utils.plot_graph import plot_algorithm_comparison,plot_comparative_performance,plot_testcase_comparison,plot_arrangement_comparison,plot_overall_comparison,plot_quicksort_comparison
 
 from algorithms.quick_sort import quick_sort_first_pivot, quick_sort_median_pivot, quick_sort_random_pivot
 from algorithms.radix_sort import radix_sort
@@ -37,7 +37,7 @@ TESTCASE_FILES = {
 }
 
 
-def analyze_all_results(results):
+def analyze_results(results):
     """
     Print a detailed analysis of the sorting algorithm results focusing on execution times.
     
@@ -194,10 +194,11 @@ if __name__=='__main__':
 
     display_machine_specs(testcases['all'])
 
-    analyze_all_results(results)
+    analyze_results(results)
 
     plot_algorithm_comparison(results['all'],save_plots=True)
     plot_comparative_performance(results['all'],save_plots=True)
     plot_testcase_comparison(results,save_plots=True)
     plot_arrangement_comparison(results,save_plots=True)
     plot_overall_comparison(results,save_plots=True)
+    plot_quicksort_comparison(results,save_plots=True)

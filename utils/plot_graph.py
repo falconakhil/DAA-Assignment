@@ -725,3 +725,142 @@ def plot_overall_comparison(results, title="Overall Algorithm Performance",
         plt.show()
     
     return figures
+
+
+def plot_quicksort_comparison(results, title="Quicksort Variants Comparison", 
+                            log_scale=False, save_plots=False, 
+                            save_dir='outputs/quicksort_plots/'):
+    """
+    Creates three separate line graphs comparing the best, average, and worst times 
+    for only the quicksort variants using the 'all' dataset.
+    
+    Args:
+        results (dict): Dictionary with arrangement names as keys and experiment results as values.
+                      Expected format: {'all': {func_name: [test_results]}, ...}
+        title (str): Title for the plot.
+        log_scale (bool): Whether to use logarithmic scale for the y-axis.
+        save_plots (bool): Whether to save the plot as an image file.
+        save_dir (str): Directory to save the plot if save_plots is True.
+    
+    Returns:
+        list: List of the three figure objects created.
+    """
+    if 'all' not in results:
+        print("Error: 'all' dataset not found in results")
+        return None
+    
+    all_results = results['all']
+    
+    # Extract only quicksort variants
+    quicksort_variants = [name for name in all_results.keys() if 'quick_sort' in name]
+    
+    if not quicksort_variants:
+        print("Error: No quicksort variants found in results")
+        return None
+    
+    # Nice display names for the quicksort variants
+    display_names = [name.replace('_', ' ').title() for name in quicksort_variants]
+    
+    # Group test cases by input size and calculate averages for each metric
+    grouped_results = {}
+    for func_name in quicksort_variants:
+        grouped_results[func_name] = defaultdict(lambda: {'min_sum': 0, 'avg_sum': 0, 'max_sum': 0, 'count': 0})
+        
+        for test_case in all_results[func_name]:
+            input_size = test_case['input_size']
+            grouped_results[func_name][input_size]['min_sum'] += test_case['min']
+            grouped_results[func_name][input_size]['avg_sum'] += test_case['avg']
+            grouped_results[func_name][input_size]['max_sum'] += test_case['max']
+            grouped_results[func_name][input_size]['count'] += 1
+    
+    # Calculate averages
+    for func_name in quicksort_variants:
+        for input_size in grouped_results[func_name]:
+            count = grouped_results[func_name][input_size]['count']
+            grouped_results[func_name][input_size]['min'] = grouped_results[func_name][input_size]['min_sum'] / count
+            grouped_results[func_name][input_size]['avg'] = grouped_results[func_name][input_size]['avg_sum'] / count
+            grouped_results[func_name][input_size]['max'] = grouped_results[func_name][input_size]['max_sum'] / count
+    
+    # Get all unique input sizes across all quicksort variants
+    all_input_sizes = set()
+    for func_name in quicksort_variants:
+        all_input_sizes.update(grouped_results[func_name].keys())
+    input_sizes = sorted(all_input_sizes)
+    
+    # Colors, markers and line styles for consistent visualization
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Blue, orange, green
+    markers = ['o', 's', '^']
+    line_styles = ['-', '--', ':']
+    
+    # Create separate figures for min, avg, and max times
+    metric_titles = ['Best Case (Minimum Time)', 'Average Case', 'Worst Case (Maximum Time)']
+    metrics = ['min', 'avg', 'max']
+    figures = []
+    
+    # Plot each metric in a separate figure
+    for metric_idx, (metric, metric_title) in enumerate(zip(metrics, metric_titles)):
+        # Create a new figure
+        fig = plt.figure(figsize=(10, 6))
+        ax = fig.add_subplot(111)
+        
+        # Plot each quicksort variant
+        for i, (func_name, display_name) in enumerate(zip(quicksort_variants, display_names)):
+            x_values = []
+            y_values = []
+            
+            for size in input_sizes:
+                if size in grouped_results[func_name]:
+                    x_values.append(size)
+                    y_values.append(grouped_results[func_name][size][metric])
+            
+            # Plot with both scatter points and lines
+            ax.scatter(x_values, y_values, 
+                     label=display_name,
+                     color=colors[i],
+                     marker=markers[i],
+                     s=60,
+                     alpha=0.7,
+                     edgecolors='black',
+                     linewidths=0.5)
+            
+            ax.plot(x_values, y_values, 
+                   color=colors[i],
+                   linestyle=line_styles[i],
+                   alpha=0.6,
+                   linewidth=2)
+        
+        # Set title and labels
+        ax.set_title(f"{title}: {metric_title}", fontsize=16)
+        ax.set_xlabel('Input Size', fontsize=14)
+        ax.set_ylabel('Time (seconds)', fontsize=14)
+        ax.grid(True, linestyle='--', alpha=0.6)
+        
+        # Set x-axis tick labels
+        ax.set_xticks(input_sizes)
+        if len(input_sizes) > 10:
+            interval = max(1, len(input_sizes) // 8)  # Show about 8 labels
+            x_labels = [str(size) if i % interval == 0 else '' for i, size in enumerate(input_sizes)]
+            ax.set_xticklabels(x_labels, rotation=45)
+        
+        # Set logarithmic scale if requested
+        if log_scale:
+            ax.set_yscale('log')
+        
+        # Add legend
+        ax.legend(fontsize=12)
+        
+        plt.tight_layout()
+        
+        # Save if requested
+        if save_plots:
+            _ensure_directory_exists(save_dir)
+            filename = os.path.join(save_dir, f"quicksort_{metric}_case_comparison.png")
+            plt.savefig(filename, dpi=300, bbox_inches='tight')
+            print(f"Quicksort {metric} comparison plot saved as '{filename}'")
+        
+        figures.append(fig)
+    
+    if not save_plots:
+        plt.show()
+    
+    return figures
