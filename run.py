@@ -1,6 +1,6 @@
 from utils.load_testcases import load_testcases
 from utils.run_experiment import run_experiment
-from utils.plot_graph import plot_algorithm_comparison,plot_comparative_performance,plot_testcase_comparison,plot_arrangement_comparison
+from utils.plot_graph import plot_algorithm_comparison,plot_comparative_performance,plot_testcase_comparison,plot_arrangement_comparison,plot_overall_comparison
 
 from algorithms.quick_sort import quick_sort_first_pivot, quick_sort_median_pivot, quick_sort_random_pivot
 from algorithms.radix_sort import radix_sort
@@ -17,12 +17,12 @@ ITERATIONS_PER_TESTCASE=3
 WARMUP_PER_TESTCASE=0
 
 FUNCTIONS=[
-    # bubble_sort,
-    # heap_sort,
-    # insertion_sort,
-    # merge_sort,
-    # radix_sort,
-    # quick_sort_first_pivot,
+    bubble_sort,
+    heap_sort,
+    insertion_sort,
+    merge_sort,
+    radix_sort,
+    quick_sort_first_pivot,
     quick_sort_median_pivot,
     quick_sort_random_pivot,
 ]
@@ -200,3 +200,4 @@ if __name__=='__main__':
     plot_comparative_performance(results['all'],save_plots=True)
     plot_testcase_comparison(results,save_plots=True)
     plot_arrangement_comparison(results,save_plots=True)
+    plot_overall_comparison(results,save_plots=True)
